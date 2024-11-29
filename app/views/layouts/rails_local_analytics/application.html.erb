@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= RailsLocalAnalytics.name.titleize %></title>
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "rails_local_analytics/application" %>
+    <%= javascript_include_tag "rails_local_analytics/application" %>
+  </head>
+
+  <body>
+    <header>
+      <nav>
+        <%= link_to rails_local_analytics_path, class: 'logo' do %>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11 11">
+            <path class="a" d="M.5,5.5s0,2,1,2,1-2,1-2,0-2,1-2,1,2,1,2,0,2,1,2,1-2,1-2,0-2,1-2,1,2,1,2,0,2,1,2,1-2,1-2"/>
+            <circle class="a" cx="5.5" cy="5.5" r="5"/>
+            <line class="a" x1="0.5" y1="5.5" x2="10.5" y2="5.5"/>
+          </svg>
+        <% end %>
+
+        <% if params[:site] %>
+          <%= link_to params[:site], site_path(params[:site], from: params[:from], to: params[:to]) %>
+
+          <% if controller_name == "pages" %>
+            &nbsp;/&nbsp;<%= link_to "pages", pages_path(params[:site], from: params[:from], to: params[:to]) %>
+          <% end %>
+
+          <% if controller_name == "referrers" %>
+            &nbsp;/&nbsp;<%= link_to "referrers", referrers_path(params[:site], from: params[:from], to: params[:to]) %>
+          <% end %>
+
+          <div class="menubutton">
+            <button type="button" id="date-range">
+              <%= l params[:from].to_date, format: :long %>
+              <% if params[:to].to_date !=  params[:from].to_date %> → <%= l params[:to].to_date, format: :long %><% end%>
+            </button>
+
+            <ul id="date-range-menu" role="menu">
+              <li role="none">
+                <%= link_to "Today", url_for(params.merge(from: Date.today, to: Date.today).to_unsafe_hash), role: "menuitem", tabindex: "-1" %>
+              </li>
+
+              <li role="none">
+                <%= link_to "Yesterday", url_for(params.merge(from: Date.yesterday, to: Date.yesterday).to_unsafe_hash), role: "menuitem", tabindex: "-1" %>
+              </li>
+
+              <li role="none">
+                <%= link_to "Last 7 days", url_for(params.merge(from: 7.days.ago.to_date, to: Date.today).to_unsafe_hash), role: "menuitem", tabindex: "-1" %>
+              </li>
+
+              <li role="none">
+                <%= link_to "Last 30 days", url_for(params.merge(from: 30.days.ago.to_date, to: Date.today).to_unsafe_hash), role: "menuitem", tabindex: "-1" %>
+              </li>
+
+              <li role="none">
+                <button type="button" popovertarget="custom-date-range" tabindex="-1" class="is-link">
+                  Custom range
+                </button>
+              </li>
+            </ul>
+          </div>
+        <% end %>
+      </nav>
+    </header>
+
+    <main>
+      <%= yield %>
+    </main>
+
+    <div popover id="custom-date-range">
+      <header id="custom-range-title">Custom range</header>
+
+      <%= form_tag url_for(params.except(:from, :to).to_unsafe_hash), method: "get", id: "dateRangeForm" do %>
+        <div role="group" class="is-block">
+          <label>From <%= date_field_tag :from, params[:from] %></label>
+          <label>To <%= date_field_tag :to, params[:to] %></label>
+        </div>
+      <% end %>
+
+      <footer>
+        <%= submit_tag "Change date range", form: "dateRangeForm" %>
+        <button type="button" popovertargetaction="hide" popovertarget="custom-date-range">Close</button>
+      </footer>
+    </div>
+  </body>
+</html>

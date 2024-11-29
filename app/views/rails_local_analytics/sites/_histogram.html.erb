@@ -1,0 +1,22 @@
+<% if histogram.bars.count > 1 %>
+  <table class="charts-css column show-primary-axis show-5-secondary-axes hide-data <%= "show-labels" if histogram.bars.count < 32 %>" style="height: calc(var(--space-2x) * 8);">
+    <tbody>
+      <% for bar in histogram.bars %>
+        <tr>
+          <th scope="row">
+            <% if bar.height > 0 %>
+              <%= link_to bar.label.day, url_for(params.merge(from: bar.label.to_date, to: bar.label.to_date).to_unsafe_hash) %>
+            <% else %>
+              <%= bar.label.day %>
+            <% end %>
+          </th>
+          <td style="--size: <%= bar.height %>; --color: rgba(var(--color-grey-100), 1);">
+            <span class="data"><%= bar.value.to_i %></span>
+            <span class="tooltip"><small class="tooltip-date"><%= l bar.label, format: :long%></small><br/><%= format_view_count bar.value %> requests</span>
+          </td>
+          </a>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

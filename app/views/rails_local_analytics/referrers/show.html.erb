@@ -1,0 +1,22 @@
+<section>
+  <h2>
+    Source: <%= params[:referrer] %>
+    <%= link_to "", File.join("https://", params[:referrer]), target: "_blank" %>
+  </h2>
+</section>
+
+<section class="card">
+  <%= render "/rails_local_analytics/sites/histogram_header", histogram: @histogram, previous_histogram: @previous_histogram %>
+  <%= render "/rails_local_analytics/sites/histogram", histogram: @histogram %>
+</section>
+<ul class="grid-auto">
+  <li class="card">
+    <h3>Source page</h3>
+    <%= render "/rails_local_analytics/referrers/table", referrers: @previous_pages %>
+  </li>
+
+  <li class="card">
+    <h3>Destination page</h3>
+    <%= render "/rails_local_analytics/pages/table", pages: @next_pages %>
+  </li>
+</ul>

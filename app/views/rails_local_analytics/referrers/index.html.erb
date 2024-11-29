@@ -1,0 +1,9 @@
+<section class="card">
+  <%= render "/rails_local_analytics/sites/histogram_header", histogram: @histogram, previous_histogram: @previous_histogram %>
+  <%= render "/rails_local_analytics/sites/histogram", histogram: @histogram %>
+</section>
+
+<section class="card">
+  <h3>Top sources</h3>
+  <%= render "table", referrers: @referrers %>
+</section>
