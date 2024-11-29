@@ -1,0 +1,45 @@
+<% title = RailsLocalAnalytics.name.titleize %>
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <meta name=viewport content="width=device-width, initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.32.0/css/theme.default.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <%= stylesheet_link_tag "rails_local_analytics/application" %>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.0/js/jquery.tablesorter.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <%= javascript_include_tag "rails_local_analytics/application" %>
+  </head>
+
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <%= link_to title , root_path, class: "navbar-brand" %>
+        </h1>
+
+        <ul class="nav navbar-nav navbar-right">
+          <li class="<%= 'active' if params[:action] == "index" && params[:controller] == "dashboard" %>">
+            <%= link_to "Tracked Requests", root_path %>
+          </li>
+
+          <% if params[:action] == "show" && params[:controller] == "dashboard" %>
+            <li class="active">
+              <%= link_to "Request Comparison", request.fullpath %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <%= yield %>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,75 @@
+<%= form_tag url_for(params.except(:start_date, :to).to_unsafe_hash), method: "get", class: "well well-sm" do %>
+  <div>
+    <label style="margin-right: 10px;">Type: <%= select_tag :type, options_for_select(["Site", "Page"], params[:type]) %></label>
+
+    <% group_by_opts = options_for_select([["All", "All"]] + @klass.display_columns.map{|x| [x.titleize.sub("Url ", "URL "), x]} , params[:group_by]) %>
+    <label style="margin-right: 10px;">Group By: <%= select_tag :group_by, group_by_opts %></label>
+    <label style="margin-right: 10px;">Search: <%= text_field_tag :search, params[:search] %></label>
+
+    <label style="margin-right: 10px;">From: <%= date_field_tag :start_date, @start_date %></label>
+    <label style="margin-right: 10px;">To: <%= date_field_tag :end_date, @end_date %></label>
+    <%= submit_tag "Filter" %>
+  </div>
+
+  <div>
+    <%= link_to "Today", url_for(params.merge(start_date: Date.today, end_date: Date.today).to_unsafe_hash) %>
+    |
+    <%= link_to "Yesterday", url_for(params.merge(start_date: (Date.today - 1.day), end_date: (Date.today - 1.day)).to_unsafe_hash) %>
+    |
+    <%= link_to "Last 7 days", url_for(params.merge(start_date: 7.days.ago.to_date, end_date: Date.today).to_unsafe_hash) %>
+    |
+    <%= link_to "Last 30 days", url_for(params.merge(start_date: 30.days.ago.to_date, end_date: Date.today).to_unsafe_hash) %>
+  </div>
+<% end %>
+
+<h2>Tracked Requests - <%= @klass.name.titleize.split(" ").last %></h2>
+
+<table class="table table-striped table-condensed table-sortable">
+  <thead>
+        <% if params[:group_by] == "All" %>
+          <% @klass.display_columns.each do |col_name| %>
+            <th><%= col_name.titleize.sub("Url ", "URL ") %></th>
+          <% end %>
+        <% else %>
+          <td>
+            <%= params[:group_by].titleize.sub("Url ", "URL ") %>
+          </td>
+        <% end %>
+
+    <th>Total <span title="Difference compared to previous period">(Difference)</span></th>
+  </thead>
+
+  <tbody>
+    <% @tracked_requests.group_by{|x| params[:group_by] != "All" ? x.send(params[:group_by]) : @klass.display_columns.map{|col| x.send(col)}}.each do |_grouping, records| %>
+      <% first_record = records.first %>
+
+      <tr>
+        <% if params[:group_by] == "All" %>
+          <% @klass.display_columns.each do |col_name| %>
+            <td>
+              <%= first_record.send(col_name) %>
+            </td>
+          <% end %>
+        <% else %>
+          <td>
+            <%= first_record.send(params[:group_by]) %>
+          </td>
+        <% end %>
+
+        <td>
+          <% total = records.sum(&:total) %>
+          <%= total %>
+
+          <% _grouping, prev_period_records = @prev_period_tracked_requests.select{|x| first_record.matches?(x) }.group_by{|x| params[:group_by] != "All" ? x.send(params[:group_by]) : @klass.display_columns.map{|col| x.send(col)}}.first %>
+          <% diff = total - prev_period_records.sum(&:total) %>
+
+          <% if diff >= 0 %>
+            (+<%= diff %>)
+          <% else %>
+            (<%= diff %>)
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
