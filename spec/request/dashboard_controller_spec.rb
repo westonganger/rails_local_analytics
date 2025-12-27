@@ -122,19 +122,22 @@ RSpec.describe RailsLocalAnalytics::DashboardController, type: :request do
 
         klass.create!(
           day: Date.today,
-          col => "some-value",
+          url_hostname: "1",
           platform: "foo",
+          col => "some-value",
         )
 
         klass.create!(
           day: Date.today,
+          url_hostname: "2",
           col => "foo",
         )
 
         klass.create!(
           day: Date.today,
-          col => "some-value",
+          url_hostname: "3",
           platform: "bar",
+          col => "some-value",
         )
 
         get rails_local_analytics.tracked_requests_path(type: :site, filter: "#{col}==some-value")
